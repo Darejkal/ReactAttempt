@@ -6,147 +6,131 @@ import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
 import { createTwoButtonAlert } from '../../Alerts';
-export type NewsFeedProps = {}
-export const NewsFeed: React.FC<NewsFeedProps> = ({ }) => {
+export type NewsFeedProps = { refreshing: boolean}
+export const NewsFeed: React.FC<NewsFeedProps> = ({refreshing }) => {
     const _isMounted = useRef(true);
+    const _isLoading = useRef(false);
     const [done, setDone] = useState(false);
     const { data } = useContext(NewAuthContext);
-    const [newsArr, setNewsArr] = useState<News[]>([]);
-    const [privateNewsArr, setPrivateNewsArr] = useState<PrivateNews[]>([]);
-    //let quantity = fetchNewsQuantity();
+    const [privateNewsArr, setPrivateNewsArr] = useState<TimedNews[]>([]);
     const loadNewsFromInside = async () => {
-        asyncStorageGetStoredData<NewsObj>(UNITED_NEWS_KEY).then(
+            asyncStorageGetStoredData<TimedNews[]>(UNITED_NEWS_KEY).then(
             (value) => {
                 if (_isMounted.current&&value) {
-                    setNewsArr(duplicateFilter(newsArr.concat(value._news)))
-                    setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value._privateNews)))
+                    setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value)))
                     setDone(true)
                 }
-            }).catch(error => console.error(error))
+            }).catch(error => {
+                console.error(error)
+            })
     }
 
     const loadDataOnlineFromInside = async () => {
+    if(!_isLoading.current){
+        _isLoading.current=true
         fetchNews(0,data!.classID).then((value)=>{
+            console.log("Ok2323232")
+            console.log(value)
             if(_isMounted.current)
             {
-            setNewsArr(duplicateFilter(newsArr.concat(value._news)))
-            setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value._privateNews)))
+            setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value)))
             setDone(true)
+            _isLoading.current=false
             }
+        }).catch(error => {
+            console.error(error)
+            _isLoading.current=false
         })
+    }
     }
     if (!done) {
         loadNewsFromInside()
         loadDataOnlineFromInside()
     }
     useEffect(() => {
+        _isMounted.current=true
         return ()=>{
             _isMounted.current=false
         }
     },[])
     useEffect(() => {
+        console.log("------------refreshing is "+refreshing)
+        console.log("------------------done is "+done)
+        if(refreshing)
+            setDone(false)
         if (!done)
-            loadDataOnlineFromInside()
+        {
+            console.log("pippppppppppppppppppppppppppppppppppppppppppp")
+            refreshing?loadDataOnlineFromInside():setTimeout(loadDataOnlineFromInside,10000)
+        }
     })
 
-    let content: any
-    if (!done) {
-        content = (<Center>
-            <ActivityIndicator size="large" />
-        </Center>)
-    } else {
-        content = (
-            <View>
-                {
-                    newsArr.map((value,index)=>
-                        <NewsView heading={value.heading} detail={value.detail} key={index} />
-                    )
-                }
-                {
-                    privateNewsArr.map((value,index)=>
-                        <NewsView heading={value.heading} detail={value.detail} key={index} />
-                    )
-                }
-            </View>
-        )
-    }
-    return content
+    return (
+        <View>
+        {!done?(<Center><ActivityIndicator size="large" /></Center>):<></>}
+        {
+            privateNewsArr.map((value,index)=>
+                <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
+            )
+        }
+        {done?
+        <Center>
+            <Text style={{padding:10,color:"grey"}}> That's all for today </Text>
+        </Center>:<></>
+        }
+        </View>
+    )
 };
-const fetchNews = async (id:number,classID:string):Promise<NewsObj> =>{
+const fetchNews = async (id:number,classID:string):Promise<TimedNews[]> =>{
     const arr1= await fetchData<News[]>(NEWS_URL+ "id=" + id)
-    const arr2= await fetchData<PrivateNews[]>(NEWS_URL+"classID=" + classID + "/" + "id=" + id)
-    let temp:NewsObj={_news:[],_privateNews:[]}
+    const arr2= await fetchData<News[]>(NEWS_URL+"classID=" + classID + "/" + "id=" + id)
+    // console.log("Arrs------------------------------")
+    // console.log(arr1)
+    // console.log(arr2)
+    let temp:TimedNews[]=[]
     if(!arr1) createTwoButtonAlert("Error ecountered while getting data","Error 101")
-    else temp._news=arr1
+    else {
+        for(let i = 0;i<arr1.length;i++ ){
+            const tempItem:TimedNews = 
+            {
+                ...arr1[i],
+                time:dateFromObjectId(arr1[i]._id)
+            }
+            temp.push(tempItem)
+        }
+    }
     if(!arr2) createTwoButtonAlert("Error ecountered while getting data","Error 102")
-    else temp._privateNews=arr2
-    asyncStorageGetStoredData<NewsObj>(UNITED_NEWS_KEY).then(
+    else {
+        for(let i = 0;i<arr2.length;i++ ){
+            const tempItem:TimedNews = 
+            {
+                ...arr2[i],
+                time:dateFromObjectId(arr2[i]._id)
+            }
+            temp.push(tempItem)
+            
+        }
+    }
+    asyncStorageGetStoredData<TimedNews>(UNITED_NEWS_KEY).then(
         (value) => {
             if (value) {
-               value._news= duplicateFilter(value._news.concat(temp._news))
-               value._privateNews= duplicateFilter(value._privateNews.concat(temp._privateNews))
+                //TODO
+                //bip bip
+                // temp = duplicateFilter(temp.concat(value))
             }
-            else {
                 AsyncStorage.setItem(UNITED_NEWS_KEY, JSON.stringify(temp));
-            }
         }
     )
     return temp
 }
-
-// const fetchPublicNews = async (id: number): Promise<News[] | null> => {
-//     const fetchURL = "https://schoolproject213.herokuapp.com/data/newsFeed/"
-//         + "id=" + id
-//     let valueHolder: null | News[] = null
-//     fetchData<News[]>(fetchURL).then(async (arr) => {
-//         if (!arr) throw ("NEWS IS NULL");
-//         asyncStorageGetStoredData<News[]>(PUBLIC_NEWS_DATA_KEY).then(
-//             (value) => {
-//                 if (value) {
-//                     valueHolder = duplicateFilter(value.concat(arr))
-//                     AsyncStorage.setItem(PUBLIC_NEWS_DATA_KEY, JSON.stringify(valueHolder));
-//                 }
-//                 else {
-//                     AsyncStorage.setItem(PUBLIC_NEWS_DATA_KEY, JSON.stringify(arr));
-//                     valueHolder = arr
-//                 }
-//             }
-//         )
-//     }).catch((e) => {
-//         console.error(e);
-//     })
-
-//     return valueHolder
-// }
-// const fetchPrivateNews = async (id: number, classID: string): Promise<PrivateNews[] | null> => {
-//     const fetchURL = "https://schoolproject213.herokuapp.com/data/newsFeed/"
-//         + "classID=" + classID + "/" + "id=" + id
-//     let valueHolder: null | PrivateNews[] = null
-//     fetchData<PrivateNews[]>(fetchURL).then(async (arr) => {
-//         if (!arr) throw ("NEWS IS NULL");
-//         asyncStorageGetStoredData<PrivateNews[]>(PRIVATE_NEWS_DATA_KEY).then(
-//             (value) => {
-//                 if (value) {
-//                     valueHolder = duplicateFilter(value.concat(arr))
-//                     AsyncStorage.setItem(PRIVATE_NEWS_DATA_KEY, JSON.stringify(valueHolder));
-//                 }
-//                 else {
-//                     AsyncStorage.setItem(PRIVATE_NEWS_DATA_KEY, JSON.stringify(arr));
-//                     valueHolder = arr
-//                 }
-//             }
-//         )
-//     }).catch((e) => {
-//         console.error(e);
-//     })
-//     return valueHolder
-// }
-type News = { _id: string, heading: string, detail: string }
-type PrivateNews = { _id: string, heading: string, detail: string, classID: string }
-type NewsObj = { _news: News[], _privateNews: PrivateNews[] }
+type News = { _id: string, heading: string, detail: string,classID: string|undefined }
+type TimedNews = { _id: string, heading: string, detail: string, classID: string|undefined,time:Date }
 const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
     try {
-        const response = await fetch(url);
+        const response = await fetch(url,{
+            headers: {
+              'Cache-Control': 'no-cache'
+            }});
         if (response.ok) {
             const body = await response.json();
             return new Promise((resolve) => { resolve(body) })
@@ -158,15 +142,19 @@ const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
         return new Promise((reject) => { reject(null) });
     }
 }
-const NewsView =({heading,detail}:{heading:string,detail:string}) => (
-    <>
+const NewsView =({heading,detail,classID,time}:{heading:string,detail:string,classID:string|undefined,time:Date}) => (
+    <View style={{marginTop:10}}>
         <View style={{ backgroundColor: "#bdc3c7" }}>
+            <View style={{flexDirection:"row"}}>
             <Text style={{ padding: 10, fontSize: 15 }}>{heading}</Text>
+            <Text style={{ paddingTop: 10, paddingBottom: 10, marginLeft: "auto", marginRight: 5,color:"grey", fontSize: 15 }}>{time.toLocaleDateString()}</Text>
+            </View>
+            {classID?<Text style={{ padding: 10,paddingTop:0, fontSize: 10,color:"grey" }}>{classID}</Text>:<></>}
         </View>
         <View style={{ backgroundColor: "#fff", padding: 20 }}>
-            <Text>{detail}</Text>
+            <Text selectable>{detail}</Text>
         </View>
-    </>
+    </View>
 )
 function duplicateFilter<T extends { _id: string }>(a: T[]) {
     var seen: any = {};
@@ -183,9 +171,7 @@ function duplicateFilter<T extends { _id: string }>(a: T[]) {
     }
     return out;
 }
-const dateFromObjectId = function (objectId) {
-    //TODO
-    //show time?
-    return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+const dateFromObjectId = function (id:string) {
+    return new Date(parseInt(id.substring(0, 8), 16) * 1000);
 };
 export default NewsFeed;

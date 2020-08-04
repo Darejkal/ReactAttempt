@@ -19,7 +19,7 @@ export const NewLogin: React.FC<NewLoginProps> = ({showLoading }) => {
                         height: 100,
                     }}
                     source={require("../../images/logo.png")}
-                ></Image>
+                />
                 <Text style={{
                     color: "#626262",
                     marginTop: 10,

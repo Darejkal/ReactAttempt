@@ -1,15 +1,14 @@
 import React, { useState, useContext, useEffect, useRef } from 'react'
 import { Timetable1 } from './Timetable1';
 import { Timetable2, TimetableData } from './Timetable2';
-import { Switch } from 'react-native-paper';
-import { Text, View, ActivityIndicator, ScrollView, AsyncStorage } from 'react-native';
+import { Text, View, ActivityIndicator, ScrollView, AsyncStorage,Switch } from 'react-native';
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
 import { TIMETABLE_KEY } from '../../KEYS';
 import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { createTwoButtonAlert } from '../../Alerts';
 interface TimetableProps {
-
+    refreshing:boolean
 }
 async function getTimetableData(classID: string): Promise<TimetableData | null> {
     try {
@@ -35,7 +34,7 @@ async function getTimetableData(classID: string): Promise<TimetableData | null> 
     }
 }
 
-export const Timetable: React.FC<TimetableProps> = ({ }) => {
+export const Timetable: React.FC<TimetableProps> = ({ refreshing }) => {
     //loading and stuffs
     const _isMounted=useRef(true)
     console.log("timetable executed")
@@ -109,6 +108,9 @@ export const Timetable: React.FC<TimetableProps> = ({ }) => {
     useEffect(()=>{
         if(done===1) {
             setTimeout(getTimetableOnline(data!.classID),10000)
+        }
+        if(refreshing){
+            getTimetableOnline(data!.classID)
         }
     })
 

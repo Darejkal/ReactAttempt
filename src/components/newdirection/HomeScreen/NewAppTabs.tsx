@@ -12,11 +12,11 @@ interface AppTabsProps {
 
 }
 const Tabs = createBottomTabNavigator<NewAppParamList>();
-function Setting({navigation}){
-    return (
-      <SettingStack/>
-    );
-}
+// function Setting({navigation}){
+//     return (
+//       <SettingStack/>
+//     );
+// }
 export const NewAppTabs: React.FC<AppTabsProps> = ({}) => {
         return (<Tabs.Navigator
             screenOptions={({ route }) => ({
@@ -38,6 +38,6 @@ export const NewAppTabs: React.FC<AppTabsProps> = ({}) => {
               }}
         >
             <Tabs.Screen name="Home" component={HomeStack}/>
-            <Tabs.Screen name="Setting" component={Setting}/>
+            <Tabs.Screen name="Setting" component={SettingStack}/>
         </Tabs.Navigator>);
 }
