@@ -5,8 +5,6 @@ import { Text, View, ActivityIndicator, ScrollView, AsyncStorage,Switch } from '
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
 import { TIMETABLE_KEY } from '../../KEYS';
-import { asyncStorageGetStoredData } from '../../AsyncShortcut';
-import { createTwoButtonAlert } from '../../Alerts';
 interface TimetableProps {
     refreshing:boolean
 }
@@ -102,7 +100,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing }) => {
     useEffect(()=>{
         prepareTimetable(data!)
         setDone(0)
-        getTimetableOnline(data!.classID)
+        // getTimetableOnline(data!.classID)
         return ()=>{_isMounted.current=false}
     },[])
     useEffect(()=>{

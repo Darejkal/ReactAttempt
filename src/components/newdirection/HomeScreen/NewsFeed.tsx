@@ -48,7 +48,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
     }
     useEffect(() => {
         _isMounted.current = true
-        AsyncStorage.removeItem(NEWS_URL).catch((error)=>console.error(error))
+        AsyncStorage.removeItem(NEWS_URL).catch((error) => console.error(error))
         return () => {
             _isMounted.current = false
         }
@@ -66,8 +66,8 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
 
     return (
         <View>
-        {!done?(<Center><ActivityIndicator size="large" /></Center>):<></>}
-        {
+            {!done ? (<Center><ActivityIndicator size="large" /></Center>) : <></>}
+            {
                 privateNewsArr.map((value, index) =>
                     <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
                 )
@@ -107,9 +107,9 @@ const fetchNews = async (id: number, classID: string): Promise<TimedNews[]> => {
 
         }
     }
-    if(arr1&&arr2)
+    if (arr1 && arr2)
         AsyncStorage.setItem(UNITED_NEWS_KEY, JSON.stringify(temp));
-    else 
+    else
         asyncStorageGetStoredData<TimedNews[]>(UNITED_NEWS_KEY).then(
             (value) => {
                 if (value) {
@@ -120,26 +120,7 @@ const fetchNews = async (id: number, classID: string): Promise<TimedNews[]> => {
         )
     return temp
 }
-export type News = { _id: string, heading: string, detail: string, classID: string | undefined }
-export type TimedNews = { _id: string, heading: string, detail: string, classID: string | undefined, time: string }
-export const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
-        if (response.ok) {
-            const body = await response.json();
-            return new Promise((resolve) => { resolve(body) })
-        } else {
-            throw new Error(response.statusText);
-        }
 
-    } catch (e) {
-        return new Promise((reject) => { reject(null) });
-    }
-}
 const NewsView = ({ heading, detail, classID, time }: { heading: string, detail: string, classID: string | undefined, time: string }) => (
     <View style={{ marginTop: 10 }}>
         <View style={{ backgroundColor: "#bdc3c7" }}>
@@ -172,4 +153,25 @@ export function duplicateFilter<T extends { _id: string }>(a: T[]) {
 export const dateFromObjectId = function (id: string) {
     return new Date(parseInt(id.substring(0, 8), 16) * 1000);
 };
+export const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
+        if (response.ok) {
+            const body = await response.json();
+            return new Promise((resolve) => { resolve(body) })
+        } else {
+            throw new Error(response.statusText);
+        }
+
+    } catch (e) {
+        return new Promise((reject) => { reject(null) });
+    }
+}
+export type News = { _id: string, heading: string, detail: string, classID: string | undefined }
+export type TimedNews = { _id: string, heading: string, detail: string, classID: string | undefined, time: string }
+
 export default NewsFeed;

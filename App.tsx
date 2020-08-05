@@ -3,8 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
 import { Platform } from 'react-native';
-// import Constants from 'expo-constants';
-// import {Subscription} from '@unimodules/react-native-adapter/build/EventEmitter'
 import { setUpFetchInBackground } from './src/components/newdirection/Notification/BackgroundTask';
 type AppProps = { }
 export const App: React.FC<AppProps> = ({ }) => {
@@ -20,29 +18,6 @@ export const App: React.FC<AppProps> = ({ }) => {
           }),
         });
     },[])
-    // const [expoPushToken, setExpoPushToken] = useState('');
-    // const [notification, setNotification] = useState<Notifications.Notification>();
-    // const notificationListener = useRef<Subscription>();
-    // const responseListener = useRef<Subscription>();
-    // useEffect(
-    //     ()=>{
-    //     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-    
-    //     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    //       setNotification(notification);
-    //     });
-    
-    //     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    //       console.log(response);
-    //     });
-    
-    //     return () => {
-    //       //@ts-expect-error
-    //       Notifications.removeNotificationSubscription(notificationListener);
-    //        //@ts-expect-error
-    //       Notifications.removeNotificationSubscription(responseListener);
-    //     };
-    //   }, []);
     return (
         <Providers/>
     )
