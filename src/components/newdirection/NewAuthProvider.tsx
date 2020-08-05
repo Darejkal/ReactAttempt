@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import AsyncStorage from '@react-native-community/async-storage';
-import { TIMETABLE_KEY, UNITED_NEWS_KEY } from '../KEYS';
+import { TIMETABLE_KEY, UNITED_NEWS_KEY, NEW_DATA_KEY } from '../KEYS';
 import { TimetableData } from './HomeScreen/Timetable2';
 type NewAuthProviderProps = { }
 type NewUserData =null|{
@@ -69,6 +69,7 @@ export const NewAuthProvider: React.FC<NewAuthProviderProps> = ({children}) => {
                 setData(null);
                 AsyncStorage.removeItem(TIMETABLE_KEY);
                 AsyncStorage.removeItem(UNITED_NEWS_KEY)
+                AsyncStorage.removeItem(NEW_DATA_KEY)
             }
         }}
         >

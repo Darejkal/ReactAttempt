@@ -11,7 +11,7 @@ export type HomeStackNavProps<T extends keyof NewHomeStackParamList>={
 }
 export type NewAppParamList={
     Home:undefined;
-    Setting:undefined;
+    Menu:undefined;
 }
 export type SettingStackParamList={
     Menu:undefined;

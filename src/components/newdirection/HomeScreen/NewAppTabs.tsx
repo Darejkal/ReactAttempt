@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import{Text, Button} from 'react-native';
 import { Center } from '../../Center';
@@ -25,11 +25,10 @@ export const NewAppTabs: React.FC<AppTabsProps> = ({}) => {
       
                   if (route.name === 'Home') {
                     iconName = 'home'
-                  } else if (route.name === 'Setting') {
+                  } else if (route.name === 'Menu') {
                     iconName = 'user'
                   }
                   return <AntDesign name={iconName} size={size} color={color}/>;
-                  // You can return any component that you like here!
                 },
               })}
               tabBarOptions={{
@@ -38,6 +37,6 @@ export const NewAppTabs: React.FC<AppTabsProps> = ({}) => {
               }}
         >
             <Tabs.Screen name="Home" component={HomeStack}/>
-            <Tabs.Screen name="Setting" component={SettingStack}/>
+            <Tabs.Screen name="Menu" component={SettingStack}/>
         </Tabs.Navigator>);
 }

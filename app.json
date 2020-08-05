@@ -28,7 +28,8 @@
     },
     "android": {
       "package": "com.tpc.reactattempt2",
-      "versionCode": 1
+      "versionCode": 1,
+      "useNextNotificationsApi": true
     }
   }
 }

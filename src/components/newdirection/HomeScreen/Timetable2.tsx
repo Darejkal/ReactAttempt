@@ -7,7 +7,7 @@ interface Timetable2Props {
     tableData: string[][];
 }
 export interface TimetableData {
-    id: string;
+    _id: string;
     classID: string;
     calendar: Calendar;
 }
