@@ -2,7 +2,8 @@ import React, { useState, useContext, useRef } from 'react'
 import { View, TouchableOpacity, Text, StatusBar, TextInput, Alert } from 'react-native';
 import { NewAuthContext } from './NewAuthProvider';
 import { createTwoButtonAlert } from '../Alerts';
-
+import { SettingTouchView } from '../Accessibility';
+import { MaterialCommunityIcons,Entypo } from "@expo/vector-icons";
 interface NewLoginFormProps {
     showLoading: (load: boolean) => void
 }
@@ -13,7 +14,7 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
     const passwordInput = useRef(null);
     const { login, data } = useContext(NewAuthContext);
     return (
-        <View style={{}}>
+        <View style={{margin:20}}>
             <StatusBar barStyle="light-content" />
             <TextInput
                 keyboardType="default"
@@ -54,10 +55,22 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
                     marginBottom: 10,
                 }}
             />
-            <TouchableOpacity style={{
-                backgroundColor: "#515151",
-                paddingVertical: 20,
-            }}
+            <SettingTouchView
+                title="Login"
+                style={{
+                    height: 50,
+                    backgroundColor: "#bdc3c7",
+                    marginTop: 5,
+                    paddingRight: 35,
+                    paddingLeft: 35,
+                    borderColor: "#95a5a6",
+                    borderRadius: 5,
+                    borderWidth: 0.25,
+                }}
+                textStyle={{
+                    fontWeight:"bold"
+                }}
+                icon={<Entypo name="login" size={20} color="black" />}
                 onPress={async () => {
                     //Validate Data:
                     if (!schoolText) createTwoButtonAlert("School cannot be empty", "Incorrect input")
@@ -82,15 +95,7 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
                                 }
                             )
                     }
-                }}>
-                <Text style={{
-                    color: "#B1B1B1",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                }}>
-                    {"Login"}
-                </Text>
-            </TouchableOpacity>
+                }}/>
         </View>
     );
 }

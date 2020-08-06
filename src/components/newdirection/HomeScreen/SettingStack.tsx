@@ -8,7 +8,7 @@ import WheelPage from './WheelPage'
 import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import { newNotification } from '../Notification/Notification';
 import { MaterialCommunityIcons,Entypo } from "@expo/vector-icons";
-const screenWidth = Dimensions.get('window').width
+import { SettingTouchView } from '../../Accessibility';
 type SettingStackProps = {}
 const Stacks = createStackNavigator<SettingStackParamList>();
 export const SettingStack: React.FC<SettingStackProps> = ({ }) => {
@@ -58,38 +58,6 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
 function Wheel({ navigation, route }: SettingStackNavProps<"Wheel">) {
     return (
         <WheelPage navigation={navigation} />
-    )
-}
-type SettingTouchViewProps ={
-    onPress:(event: GestureResponderEvent) => void,
-    title:string,
-    icon:React.ReactNode
-}
-const SettingTouchView: React.FC<SettingTouchViewProps> = ({ onPress,title,icon }) => {
-    return (
-        <TouchableOpacity
-            style={{
-                    width: screenWidth - 20,
-                    height: 50,
-                    backgroundColor: "#bdc3c7",
-                    marginTop: 5,
-                    paddingRight: 35,
-                    paddingLeft: 35,
-                    borderColor: "#95a5a6",
-                    borderRadius: 5,
-                    borderWidth: 0.25
-            }}
-            onPress={onPress}>
-            <View style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                flex: 1,
-            }}>
-                <Text style={{ marginRight: "auto" }} >{title}</Text>
-                {icon}
-            </View>
-        </TouchableOpacity>
     )
 }
 
