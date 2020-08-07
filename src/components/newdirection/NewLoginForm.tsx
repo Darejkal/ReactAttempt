@@ -4,6 +4,7 @@ import { NewAuthContext } from './NewAuthProvider';
 import { createTwoButtonAlert } from '../Alerts';
 import { SettingTouchView } from '../Accessibility';
 import { MaterialCommunityIcons,Entypo } from "@expo/vector-icons";
+import I18n from 'i18n-js';
 interface NewLoginFormProps {
     showLoading: (load: boolean) => void
 }
@@ -24,11 +25,10 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
                 editable={false}
                 //WARNINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
                 returnKeyType="go"
-                placeholder="School"
+                placeholder={I18n.t("school")}
                 value={schoolText}
                 onChangeText={text => setSchoolText(text)}
                 placeholderTextColor="#bdc3c7"
-                selectionColor='#2c3e50'
                 style={{
                     height: 40,
                     borderBottomWidth: 1,
@@ -41,22 +41,21 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
             <TextInput
                 ref={passwordInput}
                 returnKeyType="done"
-                placeholder="ClassID"
+                placeholder="ClassID [YY][YY][CLASS_ABBREVIATION]"
                 value={classIDText}
                 onChangeText={text => setClassIDText(text)}
                 placeholderTextColor="#bdc3c7"
-                selectionColor='#2c3e50'
                 style={{
                     height: 40,
                     borderBottomWidth: 1,
                     paddingLeft: 6,
-                    color: "#3498db",
+                    color: "black",
                     marginTop: 10,
                     marginBottom: 10,
                 }}
             />
             <SettingTouchView
-                title="Login"
+                title={I18n.t("login")}
                 style={{
                     height: 50,
                     backgroundColor: "#bdc3c7",
@@ -68,13 +67,13 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
                     borderWidth: 0.25,
                 }}
                 textStyle={{
-                    fontWeight:"bold"
+                    marginRight:10
                 }}
                 icon={<Entypo name="login" size={20} color="black" />}
                 onPress={async () => {
                     //Validate Data:
-                    if (!schoolText) createTwoButtonAlert("School cannot be empty", "Incorrect input")
-                    else if (!classIDText) createTwoButtonAlert("ClassID cannot be empty", "Incorrect input")
+                    if (!schoolText) createTwoButtonAlert(I18n.t("lFSchoolEmpty"), I18n.t("lFIncorrectInput"))
+                    else if (!classIDText) createTwoButtonAlert(I18n.t("lFClassEmpty"), I18n.t("lFIncorrectInput"))
                     else {
                         showLoading(true);
                         const temp: NewUserData = {
@@ -91,7 +90,7 @@ export const NewLoginForm: React.FC<NewLoginFormProps> = ({ showLoading }) => {
                                 (error: string) => {
                                     console.log("Error at form?")
                                     showLoading(false);
-                                    createTwoButtonAlert(error, "Error");
+                                    createTwoButtonAlert(error, I18n.t(error));
                                 }
                             )
                     }

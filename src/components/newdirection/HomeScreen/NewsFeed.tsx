@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react'
+import React, { useState, useContext, useEffect, useRef, useCallback } from 'react'
 import { View, Text, PointPropType, ActivityIndicator, FlatList } from 'react-native';
 import { UNITED_NEWS_KEY, NEWS_URL } from '../../KEYS';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -6,6 +6,9 @@ import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
 import { createTwoButtonAlert } from '../../Alerts';
+import { preferencesGetState } from '../../Preferences';
+import { useFocusEffect } from '@react-navigation/native';
+import I18n from 'i18n-js';
 export type NewsFeedProps = { refreshing: boolean }
 export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
     const _isMounted = useRef(true);
@@ -29,8 +32,8 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
         if (!_isLoading.current) {
             _isLoading.current = true
             fetchNews(0, data!.classID).then((value) => {
-                console.log("Ok2323232")
-                console.log(value)
+                // console.log("Ok2323232")
+                // console.log(value)
                 if (_isMounted.current) {
                     setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value)))
                     setDone(true)
@@ -54,12 +57,12 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
         }
     }, [])
     useEffect(() => {
-        console.log("------------refreshing is " + refreshing)
-        console.log("------------------done is " + done)
+        // console.log("------------refreshing is " + refreshing)
+        // console.log("------------------done is " + done)
         if (refreshing)
             setDone(false)
         if (!done) {
-            console.log("pippppppppppppppppppppppppppppppppppppppppppp")
+            // console.log("pippppppppppppppppppppppppppppppppppppppppppp")
             refreshing ? loadDataOnlineFromInside() : setTimeout(loadDataOnlineFromInside, 10000)
         }
     })
@@ -74,7 +77,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
             }
             {done ?
                 <Center>
-                    <Text style={{ padding: 10, color: "grey" }}> That's all for today </Text>
+                    <Text style={{ padding: 10, color: "grey" }}> {I18n.t("newsFeedBottom")} </Text>
                 </Center> : <></>
             }
         </View>
@@ -84,24 +87,24 @@ const fetchNews = async (id: number, classID: string): Promise<TimedNews[]> => {
     const arr2 = await fetchData<News[]>(NEWS_URL + "id=" + id)
     const arr1 = await fetchData<News[]>(NEWS_URL + "classID=" + classID + "/" + "id=" + id)
     let temp: TimedNews[] = []
-    if (!arr1) createTwoButtonAlert("Error ecountered while getting data", "Error 101")
+    if (!arr1) createTwoButtonAlert(I18n.t("getDataError"), "Error 101")
     else {
         for (let i = 0; i < arr1.length; i++) {
             const tempItem: TimedNews =
             {
                 ...arr1[i],
-                time: dateFromObjectId(arr1[i]._id).toDateString()
+                time: dateToString(dateFromObjectId(arr1[i]._id))
             }
             temp.push(tempItem)
         }
     }
-    if (!arr2) createTwoButtonAlert("Error ecountered while getting data", "Error 102")
+    if (!arr2) createTwoButtonAlert(I18n.t("getDataError"), "Error 102")
     else {
         for (let i = 0; i < arr2.length; i++) {
             const tempItem: TimedNews =
             {
                 ...arr2[i],
-                time: dateFromObjectId(arr2[i]._id).toDateString()
+                time: dateToString(dateFromObjectId(arr2[i]._id))
             }
             temp.push(tempItem)
 
@@ -120,21 +123,68 @@ const fetchNews = async (id: number, classID: string): Promise<TimedNews[]> => {
         )
     return temp
 }
-
-const NewsView = ({ heading, detail, classID, time }: { heading: string, detail: string, classID: string | undefined, time: string }) => (
+function dateToString(date:Date){
+    return date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()
+}
+export const dateFromObjectId = function (id: string) {
+    return new Date(parseInt(id.substring(0, 8), 16) * 1000);
+};
+const NewsView = ({ heading, detail, classID, time }: { heading: string, detail: string, classID: string | undefined, time: string }) =>{
+    const [color,setColor]=useState("#95a5a6")
+    const willMount = useRef(true);
+    const useComponentWillMount = useCallback(() => {
+        if (willMount.current) {
+            checkColor()
+        }
+        willMount.current = false;
+      },[willMount]);
+    const checkColor = useCallback(()=>{
+        if(preferencesGetState().colorful)
+        {
+            if(classID){
+                setColor("#e67e22")
+            } else {
+                setColor(sampleArray(colorArr))
+            }
+        } else {
+            setColor("#95a5a6")
+        }       
+    },[preferencesGetState().colorful])
+    useComponentWillMount()
+    useEffect(
+        ()=>{
+        }
+    )
+    useFocusEffect(
+        useCallback(
+        ()=>{
+            checkColor()
+        },
+        [preferencesGetState().colorful]
+        )
+    )
+    return (
     <View style={{ marginTop: 10 }}>
-        <View style={{ backgroundColor: "#bdc3c7" }}>
+        <View style={{ backgroundColor: color}}>
             <View style={{ flexDirection: "row" }}>
-                <Text style={{ padding: 10, fontSize: 15 }}>{heading}</Text>
-                <Text style={{ paddingTop: 10, paddingBottom: 10, marginLeft: "auto", marginRight: 5, color: "grey", fontSize: 15 }}>{time}</Text>
+                <Text style={{ padding: 10, fontSize: 15 }}>
+                    {heading.length<13
+                        ?heading
+                        :cutDownString(heading,20)}</Text>
+                <Text style={{ paddingTop: 10, paddingBottom: 10, marginLeft: "auto", marginRight: 5, color:"white", fontSize: 15 }}>{time}</Text>
             </View>
-            {classID ? <Text style={{ padding: 10, paddingTop: 0, fontSize: 10, color: "grey" }}>{classID}</Text> : <></>}
+            {classID ? <Text style={{ padding: 10, paddingTop: 0, fontSize: 10, color: "white" }}>{classID}</Text> : <></>}
         </View>
         <View style={{ backgroundColor: "#fff", padding: 20 }}>
             <Text selectable>{detail}</Text>
         </View>
     </View>
 )
+}
+const colorArr = ["#778beb","#546de5","#63cdda","#3dc1d3"]
+function sampleArray(arr){
+        return arr[Math.floor(Math.random()*arr.length)];
+      }
 export function duplicateFilter<T extends { _id: string }>(a: T[]) {
     var seen: any = {};
     var out: T[] = [];
@@ -150,9 +200,22 @@ export function duplicateFilter<T extends { _id: string }>(a: T[]) {
     }
     return out;
 }
-export const dateFromObjectId = function (id: string) {
-    return new Date(parseInt(id.substring(0, 8), 16) * 1000);
-};
+function cutDownString(originalText:string,maxLength:number=13):string{
+    if(originalText.length<maxLength) return originalText
+    let arr=originalText.split(" ")
+    let length=arr.length
+    let text =""
+    for(let i=0;i<length;i++){
+        if((arr[i]+arr[i+1]).length<maxLength){
+            arr[i+1]=arr[i]+" "+arr[i+1]
+        } else{
+            text+=(arr[i]+'\n')
+            arr[i]=""
+        }
+    }
+    text+=arr[length-1]
+    return text
+}
 export const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
     try {
         const response = await fetch(url, {

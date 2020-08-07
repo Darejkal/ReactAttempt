@@ -5,6 +5,7 @@ import { Center } from '../../Center';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SettingStackParamList } from './NewHomeParamList';
 import StyledTextInput from '../Accessibility/StyledTextInput';
+import I18n from 'i18n-js';
 type WheelPageProps = { 
     navigation:StackNavigationProp<SettingStackParamList, "Wheel">;
 }
@@ -20,28 +21,28 @@ export const WheelPage: React.FC<WheelPageProps> = ({ }) => {
         style={{ flex: 1, padding: 10 }}
         >
         <View style={{ backgroundColor: "#bdc3c7" }}>
-        <Text style={{ padding: 10, fontSize: 15 }}>Initial set up</Text>
+    <Text style={{ padding: 10, fontSize: 15 }}>{I18n.t("wheelInitial")}</Text>
         </View>
         <View style={{flex:1}}>
             <StyledTextInput
             style={{height:50,padding:10}}
-            placeholder="Enter number of variable"
+            placeholder={I18n.t("wheelEnterNumVar")}
             editable={editability}
             keyboardType="phone-pad"
             value={valText}
             onChangeText={value=>{setValText(value)}}
             />
             <Button
-                title="OK"
+                title={I18n.t("ok")}
                 onPress={()=>{
                     setEditability(false)
                     const parsed = Number(valText.replace(/\s/g,''))
                     if(!parsed) 
-                    {createTwoButtonAlert("Input must be number","Error")
+                    {createTwoButtonAlert(I18n.t("wheelWrongNumInput"),I18n.t("error"))
                     setEditability(true)}
                     else {
                         if(parsed>=100){
-                            createTwoButtonAlert("Stop abusing it, you filthy pig","Too many, don't ya think?")
+                            createTwoButtonAlert(I18n.t("wheelTooMuchInput"),I18n.t("wheelTooMuchInputHeading"))
                         } else{
                         setNum(parsed);
                         setVisibility(true);
@@ -62,13 +63,12 @@ export const WheelPage: React.FC<WheelPageProps> = ({ }) => {
 };
 const rollWheel =(arr:string[])=>{
     const result = arr[Math.round(Math.random()*(arr.length-1))]
-    let msg = "Rolling result"
     // const [title,setTitle]= useState(arr[0])
     Alert.alert(
-        msg,
+        I18n.t("wheelResultHeading"),
         result,
         [
-            { text: "OK", onPress: () => console.log("OK Pressed") }
+            { text: `${I18n.t("ok")}` }
         ],
         { cancelable: false }
     );
@@ -113,11 +113,11 @@ class AddVarComponent extends React.Component<AddVarComponentProps,AddVarCompone
     {this.state.arr.map((valAtIndex,index)=>
         (<View style={{ paddingTop: 10 }} key={index}>
         <View style={{ backgroundColor: "#bdc3c7" }}>
-            <Text style={{ padding: 10, fontSize: 15 }}>{`Add variable no #${index+1}`}</Text>
+            <Text style={{ padding: 10, fontSize: 15 }}>{`${I18n.t("wheelAddVar")} #${index+1}`}</Text>
         </View>
         <StyledTextInput
          style={{height:50,padding:10}}
-         placeholder="Enter value"
+         placeholder={I18n.t("wheelEnterVar")}
          value={this.state.arr[index]}
          onChangeText={(value:string)=>{
             this.updateArr(value,index)
@@ -125,12 +125,12 @@ class AddVarComponent extends React.Component<AddVarComponentProps,AddVarCompone
             }}/>   
     </View>))}
     <Button
-    title="Roll"
+    title={I18n.t("wheelRoll")}
     onPress={()=>{
         let isEmpty = false;
         for(let i=0; i<this.props.num;i++){
             if(this.state.arr[i]===""){
-                createTwoButtonAlert("Please enter all variable","Input cannot be empty")
+                createTwoButtonAlert(I18n.t("wheelVariableEmpty"),I18n.t("wheelVariableEmptyHeading"))
                 isEmpty=true
             }
         }

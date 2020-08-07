@@ -17,7 +17,7 @@ export const Timetable1: React.FC<TimetableProps> = ({ tableColumnHead, tableDat
         {/* @ts-ignore */}
           <DataTable.Header >
              {/* @ts-ignore */}
-            <DataTable.Title>{day}</DataTable.Title>
+            <DataTable.Title style={{backgroundColor:""}}>{day}</DataTable.Title>
           </DataTable.Header>
           <ScrollView horizontal={true}>
              {/* @ts-ignore */}

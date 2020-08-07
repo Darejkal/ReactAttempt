@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NewHomeStackParamList, HomeStackNavProps } from './NewHomeParamList';
 //import { Timetable1 } from './Timetable1';
 import HomeView from "./HomeView"
+import I18n from 'i18n-js';
 interface HomeStackProps {
 
 }
@@ -16,7 +17,7 @@ function Home({ navigation, route }: HomeStackNavProps<"Home">) {
 export const HomeStack: React.FC<HomeStackProps> = ({ }) => {
     return (
         <Stack.Navigator>
-            <Stack.Screen options={{}} name="Home" component={Home} />
+            <Stack.Screen options={{headerTitle:I18n.t("Home")}} name="Home" component={Home} />
         </Stack.Navigator>
     );
 }

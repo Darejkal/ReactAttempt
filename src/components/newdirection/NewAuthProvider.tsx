@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import AsyncStorage from '@react-native-community/async-storage';
 import { TIMETABLE_KEY, UNITED_NEWS_KEY, NEW_DATA_KEY } from '../KEYS';
 import { TimetableData } from './HomeScreen/Timetable2';
+import I18n from 'i18n-js';
 type NewAuthProviderProps = { }
 type NewUserData =null|{
     classID: string,
@@ -62,7 +63,7 @@ export const NewAuthProvider: React.FC<NewAuthProviderProps> = ({children}) => {
                         AsyncStorage.setItem(TIMETABLE_KEY,JSON.stringify(temp))
                         resolve("Success")
                     }
-                    else reject("There is no matched school or class")
+                    else reject(I18n.t("authLoginError"))
                 })
             },
             logout:async()=>{

@@ -7,6 +7,7 @@ import { NEWS_URL, UNITED_NEWS_KEY, TIMETABLE_KEY, NEW_DATA_KEY } from '../../KE
 import AsyncStorage from '@react-native-community/async-storage';
 import { TimetableData } from '../HomeScreen/Timetable2';
 import { pushNewNotification } from './Notification';
+import I18n from 'i18n-js';
 
 export async function setUpFetchInBackground(){
     const backgroundFunc = async()=>{
@@ -37,7 +38,7 @@ const fetchNewsToGetNewNews = async (id: number, classID: string): Promise<Timed
     const arr1 = await fetchData<News[]>(NEWS_URL + "id=" + id)
     const arr2 = await fetchData<News[]>(NEWS_URL + "classID=" + classID + "/" + "id=" + id)
     let temp: TimedNews[] = []
-    if (!arr1) createTwoButtonAlert("Error ecountered while getting data", "Error 101")
+    if (!arr1) createTwoButtonAlert(I18n.t("getDataError"), I18n.t("error")+"101")
     else {
         for (let i = 0; i < arr1.length; i++) {
             const tempItem: TimedNews =
@@ -48,7 +49,7 @@ const fetchNewsToGetNewNews = async (id: number, classID: string): Promise<Timed
             temp.push(tempItem)
         }
     }
-    if (!arr2) createTwoButtonAlert("Error ecountered while getting data", "Error 102")
+    if (!arr2) createTwoButtonAlert(I18n.t("getDataError"), I18n.t("error")+"102")
     else {
         for (let i = 0; i < arr2.length; i++) {
             const tempItem: TimedNews =

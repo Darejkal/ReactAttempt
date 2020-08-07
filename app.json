@@ -24,7 +24,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tpc.reactattempt2",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist":{
+      "UIBackgroundModes": [
+        "fetch"
+      ]
+    }
     },
     "android": {
       "package": "com.tpc.reactattempt2",

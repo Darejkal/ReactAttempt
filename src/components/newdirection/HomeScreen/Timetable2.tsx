@@ -27,7 +27,7 @@ export const Timetable2: React.FC<Timetable2Props> = ({ tableHead, tableColumnHe
 
         (
             <View
-                style={{ flex: 1, backgroundColor: '#fff', paddingTop: 30, padding: 10 }}
+                style={{ flex: 1, backgroundColor: '#fff', paddingTop: 30,paddingBottom:30, padding: 10 }}
             // horizontal={true}
             >
                 <Table
