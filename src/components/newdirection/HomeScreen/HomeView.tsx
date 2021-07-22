@@ -2,8 +2,12 @@ import React, { useRef, useEffect, useContext, useState } from 'react'
 import { View, ScrollView, Text, Image, RefreshControl } from 'react-native';
 import { Timetable } from './Timetable';
 import NewsFeed from './NewsFeed';
-type HomeViewProps = {}
-export const HomeView: React.FC<HomeViewProps> = ({ }) => {
+import { StackNavigationProp } from '@react-navigation/stack';
+import { NewHomeStackParamList } from './NewHomeParamList';
+type HomeViewProps = {
+    navigation:StackNavigationProp<NewHomeStackParamList, "Home">
+}
+export const HomeView: React.FC<HomeViewProps> = ({navigation }) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -15,7 +19,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ }) => {
                 style={{ flex: 1, padding: 10 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             >
-                <Timetable refreshing={refreshing} />
+                <Timetable refreshing={refreshing} navigation={navigation} />
                 <View style={{ paddingTop: 10 }}>
                     <NewsFeed refreshing={refreshing} />
                 </View>

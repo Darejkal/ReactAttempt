@@ -57,28 +57,31 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
         }
     }, [])
     useEffect(() => {
-        // console.log("------------refreshing is " + refreshing)
-        // console.log("------------------done is " + done)
         if (refreshing)
             setDone(false)
         if (!done) {
-            // console.log("pippppppppppppppppppppppppppppppppppppppppppp")
             refreshing ? loadDataOnlineFromInside() : setTimeout(loadDataOnlineFromInside, 10000)
         }
     })
 
     return (
         <View>
-            {!done ? (<Center><ActivityIndicator size="large" /></Center>) : <></>}
+            {!done ? (<Center><ActivityIndicator size="large" /></Center>) : undefined}
             {
-                privateNewsArr.map((value, index) =>
+                privateNewsArr.map((value, index) => value.classID?
                     <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
+                    :undefined
                 )
+            }
+            {
+                privateNewsArr.map((value, index) => value.classID?undefined:
+                <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
+            )
             }
             {done ?
                 <Center>
                     <Text style={{ padding: 10, color: "grey" }}> {I18n.t("newsFeedBottom")} </Text>
-                </Center> : <></>
+                </Center> : undefined
             }
         </View>
     )
@@ -151,10 +154,6 @@ const NewsView = ({ heading, detail, classID, time }: { heading: string, detail:
         }       
     },[preferencesGetState().colorful])
     useComponentWillMount()
-    useEffect(
-        ()=>{
-        }
-    )
     useFocusEffect(
         useCallback(
         ()=>{

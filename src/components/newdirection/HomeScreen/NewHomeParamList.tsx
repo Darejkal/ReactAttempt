@@ -3,7 +3,12 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 export type NewHomeStackParamList = {
     Home:undefined;
-    Setting:undefined;
+    FocusedPost:PostProps;
+}
+type PostProps ={
+    heading:string,
+    detail:string,
+    children?:React.ReactNode
 }
 export type HomeStackNavProps<T extends keyof NewHomeStackParamList>={
     navigation: StackNavigationProp<NewHomeStackParamList, T>;

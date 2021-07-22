@@ -21,7 +21,7 @@ export const SettingTouchView: React.FC<SettingTouchViewProps> = ({ onPress, tit
                 justifyContent: "center",
                 flex: 1,
             }}>
-                <Text style={[{ marginRight: "auto" }, textStyle]} >{title}</Text>
+                <Text style={[icon?{ marginRight: "auto" }:undefined, textStyle]} >{title}</Text>
                 {icon}
             </View>
         </TouchableOpacity>
@@ -30,7 +30,7 @@ export const SettingTouchView: React.FC<SettingTouchViewProps> = ({ onPress, tit
 type SettingTouchViewProps = {
     onPress: (event: GestureResponderEvent) => void,
     title: string,
-    icon: React.ReactNode
+    icon?: React.ReactNode
     style?: StyleProp<ViewStyle>
     textStyle?: StyleProp<TextStyle>
 }

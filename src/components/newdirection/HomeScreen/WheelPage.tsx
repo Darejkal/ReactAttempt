@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SettingStackParamList } from './NewHomeParamList';
 import StyledTextInput from '../Accessibility/StyledTextInput';
 import I18n from 'i18n-js';
+import { SettingTouchView } from '../../Accessibility';
 type WheelPageProps = { 
     navigation:StackNavigationProp<SettingStackParamList, "Wheel">;
 }
@@ -32,7 +33,7 @@ export const WheelPage: React.FC<WheelPageProps> = ({ }) => {
             value={valText}
             onChangeText={value=>{setValText(value)}}
             />
-            <Button
+            <SettingTouchView
                 title={I18n.t("ok")}
                 onPress={()=>{
                     setEditability(false)
@@ -68,7 +69,8 @@ const rollWheel =(arr:string[])=>{
         I18n.t("wheelResultHeading"),
         result,
         [
-            { text: `${I18n.t("ok")}` }
+            {text:`${I18n.t("again")}`,onPress:()=>rollWheel(arr)},
+            { text: `${I18n.t("done")}` }
         ],
         { cancelable: false }
     );
@@ -124,8 +126,9 @@ class AddVarComponent extends React.Component<AddVarComponentProps,AddVarCompone
             // console.log(arr)
             }}/>   
     </View>))}
-    <Button
+    <SettingTouchView
     title={I18n.t("wheelRoll")}
+    style={{marginBottom:20}}
     onPress={()=>{
         let isEmpty = false;
         for(let i=0; i<this.props.num;i++){

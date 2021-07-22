@@ -8,7 +8,7 @@ import { NewAuthContext } from '../NewAuthProvider';
 import WheelPage from './WheelPage'
 import { TouchableOpacity, ScrollView } from 'react-native-gesture-handler';
 import { newNotification } from '../Notification/Notification';
-import { MaterialCommunityIcons, Entypo,MaterialIcons,Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Entypo, MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { SettingTouchView, SettingSwitchView } from '../../Accessibility';
 import { preferencesGetState, preferenceChangeColorfulState, saveSettings, preferenceChangeForcedLanguageState, preferenceSetLanguageState } from '../../Preferences';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,8 +21,8 @@ const Stacks = createStackNavigator<SettingStackParamList>();
 export const SettingStack: React.FC<SettingStackProps> = ({ }) => {
     return (
         <Stacks.Navigator
-            screenOptions={({route})=>({
-                title:I18n.t(route.name),
+            screenOptions={({ route }) => ({
+                title: I18n.t(route.name),
             })}>
             <Stacks.Screen name="Menu" component={Menu} />
             <Stacks.Screen name="Wheel" component={Wheel} />
@@ -56,7 +56,7 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
                 <SettingTouchView
                     onPress={() => navigation.navigate("Wheel")}
                     title={I18n.t("Wheel")}
-                    icon={<MaterialCommunityIcons name="ferris-wheel" size={20} color="black" />} />
+                    icon={<MaterialCommunityIcons name={I18n.currentLocale().indexOf("vi")>=0?"ferris-wheel":"ticket-percent"} size={20} color="black" />} />
                 <SettingTouchView
                     onPress={() => {
                         console.log("Notification executed")
@@ -115,13 +115,13 @@ function Map({ }: SettingStackNavProps<"Map">) {
         </MapView>
     )
 }
-function Settings({navigation,route}:SettingStackNavProps<"Settings">) {
-    const [_isColorful,setColorful]=useState(preferencesGetState().colorful)
-    const [_isLanguageForced,setLanguageForced]=useState(preferencesGetState().forcedLanguage)
-    const [_isEN,setEN]=useState(preferencesGetState().language==="en")
+function Settings({ navigation, route }: SettingStackNavProps<"Settings">) {
+    const [_isColorful, setColorful] = useState(preferencesGetState().colorful)
+    const [_isLanguageForced, setLanguageForced] = useState(preferencesGetState().forcedLanguage)
+    const [_isEN, setEN] = useState(preferencesGetState().language === "en")
     useFocusEffect(
-        ()=>{
-            return ()=>{
+        () => {
+            return () => {
                 saveSettings()
             }
         }
@@ -129,51 +129,51 @@ function Settings({navigation,route}:SettingStackNavProps<"Settings">) {
 
     return (
         <View>
-                <SettingSwitchView
-                    title={I18n.t("colorfulMode")}
-                    icon={<MaterialCommunityIcons name="format-color-fill" size={25} color="grey" />} 
-                    value={_isColorful}
-                    textStyle={{fontSize:17}}
-                    onValueChange={(value)=>{
-                        preferenceChangeColorfulState(value)
-                        setColorful(value)
-                        }}/>
-                <SettingSwitchView
-                    title={I18n.t("forceLanguageMode")}
-                    icon={<Entypo name="language" size={25} color="grey" />} 
-                    value={_isLanguageForced}
-                    textStyle={{fontSize:17}}
-                    onValueChange={(value)=>{
-                        preferenceChangeForcedLanguageState(value)
-                        setLanguageForced(value)
-                }}/>
-            {_isLanguageForced?
+            <SettingSwitchView
+                title={I18n.t("colorfulMode")}
+                icon={<MaterialCommunityIcons name="format-color-fill" size={25} color="grey" />}
+                value={_isColorful}
+                textStyle={{ fontSize: 17 }}
+                onValueChange={(value) => {
+                    preferenceChangeColorfulState(value)
+                    setColorful(value)
+                }} />
+            <SettingSwitchView
+                title={I18n.t("forceLanguageMode")}
+                icon={<Entypo name="language" size={25} color="grey" />}
+                value={_isLanguageForced}
+                textStyle={{ fontSize: 17 }}
+                onValueChange={(value) => {
+                    preferenceChangeForcedLanguageState(value)
+                    setLanguageForced(value)
+                }} />
+            {_isLanguageForced ?
                 <>
-                <SettingSwitchView
-                title={"\t\t\t\t-> "+I18n.t("vi")}
-                icon={<MaterialCommunityIcons name={_isEN?"flag-variant-outline":"flag-variant"} size={25} color="grey" />} 
-                value={!_isEN}
-                textStyle={{fontSize:17}}
-                style={{
-                    borderBottomWidth:0,
-                }}
-                onValueChange={(value)=>{
-                    preferenceSetLanguageState(!value)
-                    setEN(!value)
-                }}/>
-                <SettingSwitchView
-                    title={"\t\t\t\t-> "+I18n.t("en")}
-                    icon={<MaterialCommunityIcons name={_isEN?"flag-variant":"flag-variant-outline"} size={25} color="grey" />} 
-                    value={_isEN}
-                    textStyle={{fontSize:17}}
-                    style={{
-                    }}
-                    onValueChange={(value)=>{
-                        preferenceSetLanguageState(value)
-                        setEN(value)
-                }}/>
+                    <SettingSwitchView
+                        title={"\t\t\t\t-> " + I18n.t("vi")}
+                        icon={<MaterialCommunityIcons name={_isEN ? "flag-variant-outline" : "flag-variant"} size={25} color="grey" />}
+                        value={!_isEN}
+                        textStyle={{ fontSize: 17 }}
+                        style={{
+                            borderBottomWidth: 0,
+                        }}
+                        onValueChange={(value) => {
+                            preferenceSetLanguageState(!value)
+                            setEN(!value)
+                        }} />
+                    <SettingSwitchView
+                        title={"\t\t\t\t-> " + I18n.t("en")}
+                        icon={<MaterialCommunityIcons name={_isEN ? "flag-variant" : "flag-variant-outline"} size={25} color="grey" />}
+                        value={_isEN}
+                        textStyle={{ fontSize: 17 }}
+                        style={{
+                        }}
+                        onValueChange={(value) => {
+                            preferenceSetLanguageState(value)
+                            setEN(value)
+                        }} />
                 </>
-            :undefined
+                : undefined
             }
         </View>
     )

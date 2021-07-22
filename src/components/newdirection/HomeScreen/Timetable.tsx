@@ -7,8 +7,12 @@ import { Center } from '../../Center';
 import { TIMETABLE_KEY } from '../../KEYS';
 import I18n, { t } from 'i18n-js';
 import { DAY_OF_THE_WEEK } from '../../Language';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { NewHomeStackParamList } from './NewHomeParamList';
 interface TimetableProps {
-    refreshing: boolean
+    refreshing: boolean,
+    navigation:StackNavigationProp<NewHomeStackParamList, "Home">
 }
 async function getTimetableData(classID: string): Promise<TimetableData | null> {
     try {
@@ -34,7 +38,7 @@ async function getTimetableData(classID: string): Promise<TimetableData | null> 
     }
 }
 
-export const Timetable: React.FC<TimetableProps> = ({ refreshing }) => {
+export const Timetable: React.FC<TimetableProps> = ({ refreshing,navigation }) => {
     //loading and stuffs
     const _isMounted = useRef(true)
     console.log("timetable executed")
@@ -119,7 +123,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing }) => {
     //save isEnabled in storage
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-    let tableStyle;
+    let tableStyle:React.ReactNode;
     if (done < 0) {
         tableStyle = (
             <Center>
@@ -144,7 +148,14 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing }) => {
                     value={isEnabled}
                 />
             </View>
-            {tableStyle}
+            <TouchableOpacity
+                onPress={()=>{
+                    navigation.navigate("FocusedPost",{
+                        heading:"",
+                        detail:"",
+                        children:tableStyle
+                    })
+                }}>{tableStyle}</TouchableOpacity>
         </View>
 
 
