@@ -17,7 +17,6 @@ function Home({ navigation, route }: HomeStackNavProps<"Home">) {
 }
 function FocusedPost({ navigation, route }: HomeStackNavProps<"Home">) {
     return (
-
         <Post/>
     )
 }

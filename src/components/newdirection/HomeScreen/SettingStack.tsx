@@ -72,7 +72,7 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
                 <SettingTouchView
                     title={I18n.t("Settings")}
                     onPress={() => navigation.navigate("Settings")}
-                    icon={<MaterialCommunityIcons name="settings-outline" size={20} color="black" />} />
+                    icon={<Ionicons name="settings-outline" size={20} color="black" />} />
             </View>
             <View style={{ paddingBottom: 20 }}>
                 <SettingTouchView

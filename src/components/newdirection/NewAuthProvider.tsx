@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TIMETABLE_KEY, UNITED_NEWS_KEY, NEW_DATA_KEY } from '../KEYS';
 import { TimetableData } from './HomeScreen/Timetable2';
 import I18n from 'i18n-js';
@@ -24,15 +24,19 @@ export const NewAuthContext = React.createContext<
 async function getTimetableData(classID:string):Promise<TimetableData|null>{
         try{
         const response = await fetch(
-            "https://schoolproject213.herokuapp.com/data/findTimetable/"+classID
+            "https://y2lnrwnc98.execute-api.ap-southeast-1.amazonaws.com/TestStage1/access/info/"+classID+"/timetable"
           );
        //   console.log("HEY, async!!!!");
         if (response.ok) {
-          console.log("respone ok")
-          // console.log(response)
+        //   console.log("respone ok")
+          console.log(JSON.stringify(response))
           const body = await response.json();
+          console.log(body)
+        //   console.log("Throwing error...")
+        //   throw new Error('error');
+          if(body==={})throw new Error(response.statusText);
           console.log("JSON: body  "+body)
-          return body
+          return body.Item
           } else {
               console.log("error??")
               throw new Error(response.statusText);

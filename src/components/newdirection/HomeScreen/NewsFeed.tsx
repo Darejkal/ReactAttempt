@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react'
 import { View, Text, PointPropType, ActivityIndicator, FlatList } from 'react-native';
 import { UNITED_NEWS_KEY, NEWS_URL } from '../../KEYS';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';

@@ -4,7 +4,7 @@ import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { dateFromObjectId, TimedNews, News, fetchData, duplicateFilter } from '../HomeScreen/NewsFeed';
 import { createTwoButtonAlert } from '../../Alerts';
 import { NEWS_URL, UNITED_NEWS_KEY, TIMETABLE_KEY, NEW_DATA_KEY } from '../../KEYS';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TimetableData } from '../HomeScreen/Timetable2';
 import { pushNewNotification } from './Notification';
 import I18n from 'i18n-js';

@@ -2,14 +2,20 @@ import React from 'react'
 import { DataTable } from 'react-native-paper';
 import { ScrollView } from 'react-native-gesture-handler';
 import { View } from 'react-native';
+import { useEffect } from 'react';
 
 interface TimetableProps {
   tableHead: string[];
   tableColumnHead: string[];
-  tableData: string[][];
+  tableData: string[];
 }
 
 export const Timetable1: React.FC<TimetableProps> = ({ tableColumnHead, tableData }) => {
+  useEffect(()=>{
+    console.log("context from timetable1---------------------------")
+    console.log(tableColumnHead)
+    console.log(tableData)
+  },[])
   return (
     <View style={{ flex: 1 }}>
       {tableColumnHead.map((day) => (
@@ -23,7 +29,7 @@ export const Timetable1: React.FC<TimetableProps> = ({ tableColumnHead, tableDat
              {/* @ts-ignore */}
             <DataTable.Row>
                {/* @ts-ignore */}
-              <DataTable.Cell>{tableData[tableColumnHead.indexOf(day)][0]}</DataTable.Cell>
+              <DataTable.Cell>{tableData[tableColumnHead.indexOf(day)]}</DataTable.Cell>
             </DataTable.Row>
           </ScrollView>
         </DataTable>)

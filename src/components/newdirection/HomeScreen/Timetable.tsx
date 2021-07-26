@@ -1,31 +1,33 @@
 import React, { useState, useContext, useEffect, useRef } from 'react'
 import { Timetable1 } from './Timetable1';
 import { Timetable2, TimetableData } from './Timetable2';
-import { Text, View, ActivityIndicator, ScrollView, AsyncStorage, Switch } from 'react-native';
+import { Text, View, ActivityIndicator, ScrollView, Switch } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
 import { TIMETABLE_KEY } from '../../KEYS';
 import I18n, { t } from 'i18n-js';
-import { DAY_OF_THE_WEEK } from '../../Language';
+import { arr_DAY_OF_THE_WEEK } from '../../Language';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { NewHomeStackParamList } from './NewHomeParamList';
 interface TimetableProps {
     refreshing: boolean,
-    navigation:StackNavigationProp<NewHomeStackParamList, "Home">
+    navigation?: StackNavigationProp<NewHomeStackParamList, "Home">
 }
 async function getTimetableData(classID: string): Promise<TimetableData | null> {
     try {
+        //FIXME:
         const response = await fetch(
-            "https://schoolproject213.herokuapp.com/data/findTimetable/" + classID
+            "https://y2lnrwnc98.execute-api.ap-southeast-1.amazonaws.com/TestStage1/access/info/" + classID + "/timetable"
         );
-        //   console.log("HEY, async!!!!");
+        console.log("HEY, async!!!!");
         if (response.ok) {
             console.log("respone ok")
             // console.log(response)
             const body = await response.json();
             console.log("JSON: body  " + body)
-            return new Promise((resolve) => { resolve(body) })
+            return new Promise((resolve) => { resolve(body.Item) })
         } else {
             // createTwoButtonAlert("Error loading data","Error 106")
             throw new Error(response.statusText);
@@ -38,54 +40,33 @@ async function getTimetableData(classID: string): Promise<TimetableData | null> 
     }
 }
 
-export const Timetable: React.FC<TimetableProps> = ({ refreshing,navigation }) => {
+export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) => {
     //loading and stuffs
     const _isMounted = useRef(true)
     console.log("timetable executed")
     const [TableHead, setTableHead] = useState([I18n.t("timetableHead1"), I18n.t("timetableHead2")])
     const [TableColumnHead, setTableColumnHead] = useState([I18n.t("error")]);
-    const [TableData, setTableData] = useState([["104"]]);
+    const [TableData, setTableData] = useState(["104"]);
     const [done, setDone] = useState(-1);
     const { data } = useContext(NewAuthContext);
+    console.log("DATA" + data)
+    console.log("DATA" + JSON.stringify(data))
     const prepareTimetable = (timetableData: TimetableData) => {
-        let temp1: string[] = [];
-        let temp2: string[][] = [];
-        for (const [key, value] of Object.entries(timetableData!.calendar)) {
-            console.log(key + " " + value);
-            let day = " ";
-            switch (key) {
-                case "Mon":
-                    day = DAY_OF_THE_WEEK.Mon;
-                    break;
-                case "Tue":
-                    day = DAY_OF_THE_WEEK.Tue;
-                    break;
-                case "Wed":
-                    day = DAY_OF_THE_WEEK.Wed;
-                    break;
-                case "Thu":
-                    day = DAY_OF_THE_WEEK.Thu;
-                    break;
-                case "Fri":
-                    day = DAY_OF_THE_WEEK.Fri;
-                    break;
-                case "Sat":
-                    day = DAY_OF_THE_WEEK.Sat;
-                    break;
-                case "Sun":
-                    day = DAY_OF_THE_WEEK.Sun;
-                    break;
-                default:
-                    day = "Error 101";
-                    break;
-            }
-            //TODO:
-            //REGEX?
-            temp1.push(day);
-            temp2.push([value]);
+        // let temp1: string[] = [];
+        let temp2: string[] = [...arr_DAY_OF_THE_WEEK];
+        for (const [key, value] of Object.entries(timetableData)) {
+            console.log("validate: " + key + " " + value);
+            if (key === "classID" || key === "schoolID") continue
+            // temp1.push(key);
+            // console.log("temp1:" + temp1)
+            console.log("IMMMMMMMMMMMMMMMMMMMMMMMMMM WHAT YOU WANTTTTTTT")
+            console.log(value)
+            temp2[temp2.indexOf(key)]=value;
+            console.log(temp2)
         }
+        // throw new Error("error")
         if (_isMounted.current) {
-            setTableColumnHead(temp1);
+            setTableColumnHead(arr_DAY_OF_THE_WEEK);
             setTableData(temp2);
         }
     }
@@ -123,7 +104,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing,navigation }) =
     //save isEnabled in storage
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-    let tableStyle:React.ReactNode;
+    let tableStyle: React.ReactNode;
     if (done < 0) {
         tableStyle = (
             <Center>
@@ -149,11 +130,11 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing,navigation }) =
                 />
             </View>
             <TouchableOpacity
-                onPress={()=>{
-                    navigation.navigate("FocusedPost",{
-                        heading:"",
-                        detail:"",
-                        children:tableStyle
+                onPress={() => {
+                    navigation?.navigate("FocusedPost", {
+                        heading: "",
+                        detail: "",
+                        children: tableStyle
                     })
                 }}>{tableStyle}</TouchableOpacity>
         </View>

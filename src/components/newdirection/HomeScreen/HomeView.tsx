@@ -21,7 +21,7 @@ export const HomeView: React.FC<HomeViewProps> = ({navigation }) => {
             >
                 <Timetable refreshing={refreshing} navigation={navigation} />
                 <View style={{ paddingTop: 10 }}>
-                    <NewsFeed refreshing={refreshing} />
+                    {/* <NewsFeed refreshing={refreshing} /> */}
                 </View>
             </ScrollView>
         </View>

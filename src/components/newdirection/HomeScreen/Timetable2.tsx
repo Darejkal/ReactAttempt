@@ -1,15 +1,25 @@
 import React from 'react'
-import { View } from 'react-native'
+import { useContext } from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { View,Text } from 'react-native'
 import { Table, Row, Rows, Col, TableWrapper } from 'react-native-table-component';
 interface Timetable2Props {
     tableHead: string[];
     tableColumnHead: string[];
-    tableData: string[][];
+    tableData: string[];
 }
 export interface TimetableData {
-    _id: string;
     classID: string;
-    calendar: Calendar;
+    schoolID: string;
+    Mon: string | null;
+    Tue: string | null;
+    Wed: string | null;
+    Thu: string | null;
+    Fri: string | null;
+    Sat: string | null;
+    Sun: string | null;
+ //   calendar: Calendar; -> old mongodb
 }
 interface Calendar {
     Mon: string | null;
@@ -22,7 +32,15 @@ interface Calendar {
 }
 
 export const Timetable2: React.FC<Timetable2Props> = ({ tableHead, tableColumnHead, tableData }) => {
-
+    const [splitedTableData,setSplitedTableData]=useState([]);
+    useEffect( ()=>{
+        let arr:string[][]=[]
+        tableData.forEach((i)=>{arr.push(i.split(" "))})
+        //@ts-ignore
+        setSplitedTableData(arr)
+        console.log("arr is HERRRRRRRRRRRRRRRRRRE")
+        console.log(arr)
+    },[])
     return (
 
         (
@@ -36,11 +54,12 @@ export const Timetable2: React.FC<Timetable2Props> = ({ tableHead, tableColumnHe
                 >
                     <Row data={tableHead} flexArr={[1, 2]} style={{ backgroundColor: '#95a5a6', height: 40 }} textStyle={{ textAlign: 'center' }} />
                     <TableWrapper style={{ flexDirection: 'row' }}>
-                        <Col data={tableColumnHead} style={{ backgroundColor: '#ecf0f1', flex: 1 }} textStyle={{ textAlign: "center" }} />
-                        <Rows data={tableData} style={{ height: 50 }} flexArr={[2]} textStyle={{ textAlign: 'center' }} />
+                        <Col data={tableColumnHead}  style={{ backgroundColor: '#ecf0f1', flex: 2.5 }} textStyle={{ textAlign: "center" }} />
+                        <Rows data={splitedTableData} style={{ height: 50 }} flexArr={[1,1,1,1,1]} textStyle={{ textAlign: 'center' }} />
                     </TableWrapper>
                 </Table>
             </View>
+            // <Text>Yo</Text>
         )
     )
 }

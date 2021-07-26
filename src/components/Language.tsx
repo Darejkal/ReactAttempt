@@ -49,7 +49,8 @@ export async function prepareLanguage() {
             Home:"Home",
             forceLanguageMode:"Prefered language",
             vi:"Vietnamese - Tiếng Việt",
-            en:"English"
+            en:"English",
+            FocusedPost:"Your Timetable"
         },
         vi: {
             tableHeading: "Thời khóa biểu",
@@ -97,7 +98,8 @@ export async function prepareLanguage() {
             Home:"NewsFeed",
             forceLanguageMode:"Ngôn ngữ ưu tiên",
             vi:"Tiếng Việt",
-            en:"Tiếng Anh - English"
+            en:"Tiếng Anh - English",
+            FocusedPost:"Thời khóa biểu"
             
         }
     };
@@ -105,7 +107,7 @@ export async function prepareLanguage() {
     I18n.locale = forcedLanguage? language:Localization.locale
     I18n.fallbacks = true;
 }
-export const DAY_OF_THE_WEEK = {
+export const DAY_OF_THE_WEEK:object = {
     Mon: 'Mon',
     Tue: 'Tue',
     Wed: 'Wed',
@@ -115,3 +117,4 @@ export const DAY_OF_THE_WEEK = {
     Sun: "Sun",
 
 }
+export const arr_DAY_OF_THE_WEEK:string[] = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']

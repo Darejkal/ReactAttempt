@@ -2,7 +2,7 @@ import { createStore } from 'redux'
 import { asyncStorageGetStoredData } from './AsyncShortcut'
 import { SETTINGS_KEY } from './KEYS'
 import { useCallback } from 'react'
-import AsyncStorage from '@react-native-community/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Restart} from 'fiction-expo-restart';
 type SettingPreferences = {
     colorful: boolean,

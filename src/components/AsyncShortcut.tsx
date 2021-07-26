@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export async function asyncStorageGetStoredData<T>(KEY: string): Promise<T | null> {
     const json:string|null = await asyncStoragecontains(KEY).then((contains) => {
