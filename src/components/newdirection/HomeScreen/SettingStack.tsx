@@ -14,8 +14,8 @@ import { preferencesGetState, preferenceChangeColorfulState, saveSettings, prefe
 import { useFocusEffect } from '@react-navigation/native';
 import { createTwoButtonAlert } from '../../Alerts';
 import I18n from 'i18n-js';
-const scrWidth = Dimensions.get('window').width
-const scrHeight = Dimensions.get('window').height
+const scrWidth = Dimensions.get('screen').width
+const scrHeight = Dimensions.get('screen').height
 type SettingStackProps = {}
 const Stacks = createStackNavigator<SettingStackParamList>();
 export const SettingStack: React.FC<SettingStackProps> = ({ }) => {
@@ -38,10 +38,16 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
             style={{ flex: 1, padding: 10 }}>
             <View
                 style={{
-                    height: scrHeight - 119,
+                    height: Math.max(scrHeight-150,500),
                     paddingBottom: 10
                 }}>
-                <Center>
+                <View
+                style={{
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+                >
                     <Image
                         style={{
                             width: 100,
@@ -52,7 +58,7 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
                     <Text style={{ fontWeight: "bold", fontSize: 20 }}>{I18n.t("loginInform")}:</Text>
                     <Text>{I18n.t("class")}:{data!.classID}</Text>
                     <Text>{I18n.t("school")}: tpc</Text>
-                </Center>
+                </View>
                 <SettingTouchView
                     onPress={() => navigation.navigate("Wheel")}
                     title={I18n.t("Wheel")}
@@ -74,7 +80,7 @@ function Menu({ navigation, route }: SettingStackNavProps<"Menu">) {
                     onPress={() => navigation.navigate("Settings")}
                     icon={<Ionicons name="settings-outline" size={20} color="black" />} />
             </View>
-            <View style={{ paddingBottom: 20 }}>
+            <View style={{ marginBottom: Math.max(scrHeight*0.1,90) }}>
                 <SettingTouchView
                     onPress={() => logout()}
                     title={I18n.t("logout")}

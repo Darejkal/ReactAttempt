@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react'
-import { View, Text, PointPropType, ActivityIndicator, FlatList } from 'react-native';
-import { UNITED_NEWS_KEY, NEWS_URL } from '../../KEYS';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, PointPropType, ActivityIndicator, FlatList, Keyboard, Pressable, Dimensions} from 'react-native';
+import { NEWSFEED_KEY, NEWSFEED_HANDLER_URL } from '../../KEYS';
 import { asyncStorageGetStoredData } from '../../AsyncShortcut';
 import { NewAuthContext } from '../NewAuthProvider';
 import { Center } from '../../Center';
@@ -9,15 +8,27 @@ import { createTwoButtonAlert } from '../../Alerts';
 import { preferencesGetState } from '../../Preferences';
 import { useFocusEffect } from '@react-navigation/native';
 import I18n from 'i18n-js';
-export type NewsFeedProps = { refreshing: boolean }
-export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
+import { colorArr, cutDownString, dateStringFormat, duplicateFilter, fetchNews, NewsArrayHandler, postNews, sampleArray, TimedNews } from './NewsFeedEngine';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { NewHomeStackParamList } from './NewHomeParamList';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
+export type NewsFeedProps = {
+    refreshing: boolean,
+    setRefreshing: React.Dispatch<React.SetStateAction<boolean>>,
+    navigation: StackNavigationProp<NewHomeStackParamList, "Home">,
+    setPrivateNewsArr:React.Dispatch<React.SetStateAction<TimedNews[]>>,
+    privateNewsArr:TimedNews[],
+    // opacity: number,
+    // setOpacity: React.Dispatch<React.SetStateAction<number>>
+    // savePostingLocation: (x:number,y:number)=>void
+}
+export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing, setRefreshing, navigation,privateNewsArr,setPrivateNewsArr }) => {
     const _isMounted = useRef(true);
     const _isLoading = useRef(false);
     const [done, setDone] = useState(false);
     const { data } = useContext(NewAuthContext);
-    const [privateNewsArr, setPrivateNewsArr] = useState<TimedNews[]>([]);
     const loadNewsFromInside = async () => {
-        asyncStorageGetStoredData<TimedNews[]>(UNITED_NEWS_KEY).then(
+        asyncStorageGetStoredData<TimedNews[]>(NEWSFEED_KEY).then(
             (value) => {
                 if (_isMounted.current && value) {
                     setPrivateNewsArr(duplicateFilter(privateNewsArr.concat(value)))
@@ -31,7 +42,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
     const loadDataOnlineFromInside = async () => {
         if (!_isLoading.current) {
             _isLoading.current = true
-            fetchNews(0, data!.classID).then((value) => {
+            fetchNews(data!.schoolID, data!.classID).then((value) => {
                 // console.log("Ok2323232")
                 // console.log(value)
                 if (_isMounted.current) {
@@ -45,195 +56,238 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ refreshing }) => {
             })
         }
     }
-    if (!done) {
-        loadNewsFromInside()
-        loadDataOnlineFromInside()
-    }
+
     useEffect(() => {
+        if (!done) {
+            async function loadThatsMeantToBeUsedLocally() {
+                loadNewsFromInside()
+                loadDataOnlineFromInside()
+            }
+            loadThatsMeantToBeUsedLocally();
+        }
         _isMounted.current = true
-        AsyncStorage.removeItem(NEWS_URL).catch((error) => console.error(error))
+        // AsyncStorage.removeItem(NEWSFEED_KEY).catch((error) => console.error(error))
         return () => {
             _isMounted.current = false
         }
     }, [])
     useEffect(() => {
-        if (refreshing)
-            setDone(false)
-        if (!done) {
-            refreshing ? loadDataOnlineFromInside() : setTimeout(loadDataOnlineFromInside, 10000)
+        if (refreshing) {
+            setDone(false);
+            setRefreshing(false);
+            loadDataOnlineFromInside();
         }
     })
-
     return (
-        <View>
-            {!done ? (<Center><ActivityIndicator size="large" /></Center>) : undefined}
-            {
-                privateNewsArr.map((value, index) => value.classID?
-                    <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
-                    :undefined
-                )
-            }
-            {
-                privateNewsArr.map((value, index) => value.classID?undefined:
-                <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
-            )
-            }
-            {done ?
-                <Center>
-                    <Text style={{ padding: 10, color: "grey" }}> {I18n.t("newsFeedBottom")} </Text>
-                </Center> : undefined
-            }
+        <View >
+            <View>
+                {
+                    privateNewsArr.map((value, index) => value.classID ?
+                        <NewsView value={value} key={index} />
+                        : undefined
+                    )
+                }
+                {/* {
+                    privateNewsArr.map((value, index) => value.classID ? undefined :
+                        <NewsView heading={value.heading} detail={value.detail} classID={value.classID} time={value.time} key={index} />
+                    )
+                } */}
+                {done ?
+                    <Center>
+                        <Text style={{ padding: 10, color: "grey" }}> {I18n.t("newsFeedBottom")} </Text>
+                    </Center> : undefined
+                }
+            </View>
+            
         </View>
     )
 };
-const fetchNews = async (id: number, classID: string): Promise<TimedNews[]> => {
-    const arr2 = await fetchData<News[]>(NEWS_URL + "id=" + id)
-    const arr1 = await fetchData<News[]>(NEWS_URL + "classID=" + classID + "/" + "id=" + id)
-    let temp: TimedNews[] = []
-    if (!arr1) createTwoButtonAlert(I18n.t("getDataError"), "Error 101")
-    else {
-        for (let i = 0; i < arr1.length; i++) {
-            const tempItem: TimedNews =
-            {
-                ...arr1[i],
-                time: dateToString(dateFromObjectId(arr1[i]._id))
-            }
-            temp.push(tempItem)
-        }
-    }
-    if (!arr2) createTwoButtonAlert(I18n.t("getDataError"), "Error 102")
-    else {
-        for (let i = 0; i < arr2.length; i++) {
-            const tempItem: TimedNews =
-            {
-                ...arr2[i],
-                time: dateToString(dateFromObjectId(arr2[i]._id))
-            }
-            temp.push(tempItem)
 
-        }
-    }
-    if (arr1 && arr2)
-        AsyncStorage.setItem(UNITED_NEWS_KEY, JSON.stringify(temp));
-    else
-        asyncStorageGetStoredData<TimedNews[]>(UNITED_NEWS_KEY).then(
-            (value) => {
-                if (value) {
-                    temp = duplicateFilter(temp.concat(value))
-                }
-                AsyncStorage.setItem(UNITED_NEWS_KEY, JSON.stringify(temp));
-            }
-        )
-    return temp
-}
-function dateToString(date:Date){
-    return date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()
-}
-export const dateFromObjectId = function (id: string) {
-    return new Date(parseInt(id.substring(0, 8), 16) * 1000);
-};
-const NewsView = ({ heading, detail, classID, time }: { heading: string, detail: string, classID: string | undefined, time: string }) =>{
-    const [color,setColor]=useState("#95a5a6")
+const NewsView = ({ value}: { value:TimedNews,key:number}) => {
+    const [color, setColor] = useState("#95a5a6")
+    const [color2, setColor2] = useState("#3b5249")
+    const [color3, setColor3] = useState("#519872")
+    const [color4, setColor4] = useState("#D1DECE")
     const willMount = useRef(true);
-    const useComponentWillMount = useCallback(() => {
-        if (willMount.current) {
-            checkColor()
-        }
-        willMount.current = false;
-      },[willMount]);
-    const checkColor = useCallback(()=>{
-        if(preferencesGetState().colorful)
-        {
-            if(classID){
-                setColor("#e67e22")
-            } else {
-                setColor(sampleArray(colorArr))
-            }
+    const checkColor = useCallback(() => {
+        if (preferencesGetState().colorful) {
+            let Farbe=sampleArray(colorArr);
+            setColor(Farbe[0])
+            setColor2(Farbe[1])
+            setColor3(Farbe[2])
+            setColor4("white");
         } else {
-            setColor("#95a5a6")
-        }       
-    },[preferencesGetState().colorful])
-    useComponentWillMount()
+            setColor("#A4B494")
+            setColor2("#BEC5AD")
+            setColor3("#519872")
+            setColor4("#D1DECE")
+        }
+    }, [preferencesGetState().colorful])
+    
     useFocusEffect(
         useCallback(
-        ()=>{
-            checkColor()
-        },
-        [preferencesGetState().colorful]
+            () => {
+                checkColor()
+            },
+            [preferencesGetState().colorful]
         )
     )
     return (
-    <View style={{ marginTop: 10 }}>
-        <View style={{ backgroundColor: color}}>
-            <View style={{ flexDirection: "row" }}>
-                <Text style={{ padding: 10, fontSize: 15 }}>
-                    {heading.length<13
-                        ?heading
-                        :cutDownString(heading,20)}</Text>
-                <Text style={{ paddingTop: 10, paddingBottom: 10, marginLeft: "auto", marginRight: 5, color:"white", fontSize: 15 }}>{time}</Text>
+        <View style={{ flex:1,marginTop:15,borderRadius:5,backgroundColor: color4 }}>
+            <View style={{padding: 10,borderColor: color, borderWidth: 10, borderRadius:5}}>
+                <View style={{ flexDirection: "row",backgroundColor: color3,borderRadius:10 }}>
+                    <Text style={{padding:20, fontSize: 14,backgroundColor:color2,borderRadius:10 }}>
+                        {value.heading.length < 13
+                            ? value.heading
+                            : cutDownString(value.heading, 20)}</Text>
+                    <Text style={{ padding:20, marginLeft: "auto", marginRight: 5, color: "white", fontSize: 15 }}>{value.time}</Text>
+                </View>
+                 <Text style={{ padding: 10, paddingTop: 0, fontSize: 10, }}>{`From: ${value.username}, email: ${value.userID},\n${value.classID} | School: ${value.schoolID}`}</Text> 
+                <Text selectable>{ `${value.detail}`}</Text>
             </View>
-            {classID ? <Text style={{ padding: 10, paddingTop: 0, fontSize: 10, color: "white" }}>{classID}</Text> : <></>}
         </View>
-        <View style={{ backgroundColor: "#fff", padding: 20 }}>
-            <Text selectable>{detail}</Text>
-        </View>
-    </View>
-)
+    )
 }
-const colorArr = ["#778beb","#546de5","#63cdda","#3dc1d3"]
-function sampleArray(arr){
-        return arr[Math.floor(Math.random()*arr.length)];
-      }
-export function duplicateFilter<T extends { _id: string }>(a: T[]) {
-    var seen: any = {};
-    var out: T[] = [];
-    var len = a.length;
-    var j = 0;
-    for (var i = 0; i < len; i++) {
-        var item = a[i];
-        var _id = item._id
-        if (seen[_id] !== 1) {
-            seen[_id] = 1;
-            out[j++] = item;
-        }
-    }
-    return out;
+type NewsPostingFormProps ={
+    setPrivateNewsArr:React.Dispatch<React.SetStateAction<TimedNews[]>>,
+    privateNewsArr:TimedNews[],
+    setParentOpacity: React.Dispatch<React.SetStateAction<number>>,
+    parentOpacity: number, 
+    savePostingLocation:(x:number,y:number)=>void 
 }
-function cutDownString(originalText:string,maxLength:number=13):string{
-    if(originalText.length<maxLength) return originalText
-    let arr=originalText.split(" ")
-    let length=arr.length
-    let text =""
-    for(let i=0;i<length;i++){
-        if((arr[i]+arr[i+1]).length<maxLength){
-            arr[i+1]=arr[i]+" "+arr[i+1]
-        } else{
-            text+=(arr[i]+'\n')
-            arr[i]=""
-        }
-    }
-    text+=arr[length-1]
-    return text
-}
-export const fetchData = async <T extends unknown>(url: string): Promise<T | null> => {
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
-        if (response.ok) {
-            const body = await response.json();
-            return new Promise((resolve) => { resolve(body) })
+export const NewsPostingForm = ({setPrivateNewsArr,privateNewsArr, setParentOpacity, parentOpacity,savePostingLocation }: NewsPostingFormProps) => {
+    const [valText, setValText] = useState("");
+    const [valHeading, setValHeading] = useState("");
+    const [showSubmit, setShowSubmit] = useState(false);
+    const [editability, setEditability] = useState(true);
+    const { userData } = useContext(NewAuthContext);
+    const [textInputBackgroundColor,setTextInputBackgroundColor] =useState("transparent");
+    const [textInputHeight,setTextInputHeight] =useState(100);
+    const _headingInput:React.MutableRefObject<any>=useRef(null);
+    const _textInput:React.MutableRefObject<any>=useRef(null);
+    const [color,setColor]=useState("#7B9362");
+    const [color2,setColor2]=useState("#3B5249");
+    const [color3,setColor3]=useState("#C6D5C3");
+    const [color4,setColor4]=useState("#A4B494");
+    // const _backgroundFallbackColor=useRef("#95a5a6");
+    // const _focusBackgroundColor=useRef("white");
+    const checkColor = useCallback(() => {
+        if (preferencesGetState().colorful) {
+            let Farbe=sampleArray(colorArr);
+            setColor(Farbe[0])
+            setColor2(Farbe[1])
+            setColor3("white")
+            setColor4(Farbe[3]);
         } else {
-            throw new Error(response.statusText);
+            setColor("#7B9362")
+            setColor2("#3B5249")
+            setColor3("#C6D5C3")
+            setColor4("#A4B494")
         }
-
-    } catch (e) {
-        return new Promise((reject) => { reject(null) });
+    }, [preferencesGetState().colorful])
+    useFocusEffect(
+        useCallback(
+            () => {
+                checkColor()
+            },
+            [preferencesGetState().colorful]
+        )
+    )
+    function submitHanlding()
+    {
+        let newPost =
+        {
+        _id: Date.now().toString(),
+        heading: valHeading, 
+        detail: valText, 
+        classID: userData!.classID, 
+        userID: userData!.userID, 
+        username: userData!.username, 
+        schoolID: userData!.schoolID,
+        time:""
+        }
+        newPost.time=dateStringFormat(newPost._id);
+        postNews(newPost).then(
+            (isOK)=>{
+                if(!isOK) return;
+                createTwoButtonAlert(I18n.t("SuccessfullySubmitted"), I18n.t("Success"));
+                setPrivateNewsArr([newPost].concat(privateNewsArr))
+                setValHeading("");
+                setValText("");
+            }
+        )
+        Keyboard.dismiss()
     }
+    useEffect(()=>{
+        if(valHeading!=""||valText!="") setShowSubmit(true);
+        else setShowSubmit(false);
+    },[valText,valHeading])
+    return (
+        <View style={{ flex: 1 }}
+            onLayout={(event)=>{
+                    let {x,y}= event.nativeEvent.layout;
+                    savePostingLocation(x, y);
+                }}
+        > 
+            <View
+                style={{padding: 10, borderColor: color4, borderWidth: 10, borderRadius: 5,backgroundColor:color3 }}
+            >
+                <ScrollView keyboardShouldPersistTaps={"handled"}>
+                    <View style={{ backgroundColor: color4,padding:10,borderRadius:5 }}>
+                    <TextInput
+                        ref={_headingInput}
+                        style={[{ 
+                            padding: 10,
+                            textAlignVertical: 'top',
+                            backgroundColor:"transparent",
+                            color:"black",
+                            height:50
+                        }]}                        
+                        placeholder={I18n.t("WhatToSay")+"...."}
+                        placeholderTextColor="#000" 
+                        editable={editability}
+                        value={valHeading}
+                        onChangeText={value => { setValHeading(value) }}
+                        onFocus={()=>{
+                            setParentOpacity(0.1);
+                        }}
+                    />
+                    </View>
+                    <TextInput
+                        ref={_textInput}
+                        style={[{ 
+                            padding: 10,
+                            textAlignVertical: 'top',
+                            backgroundColor:"transparent",
+                            color:color2,
+                            height:Math.max(textInputHeight,100)
+                        }]}                        
+                        multiline={true}
+                        placeholder={I18n.t("TypeSomething")}
+                        editable={editability}
+                        value={valText}
+                        onContentSizeChange={(e) =>  setTextInputHeight(e.nativeEvent.contentSize.height)}
+                        onChangeText={value => { setValText(value) }}
+                        onFocus={()=>{
+                            setParentOpacity(0.1);
+                        }}
+                    />
+                   {
+                   showSubmit?<Pressable
+                    onPress={()=>submitHanlding()}
+                    ><Text
+                    style={{backgroundColor:color,padding:20,textAlign: 'center',borderRadius:7}}
+                    >
+                        Submit
+                    </Text>
+                        </Pressable>:undefined}
+                </ScrollView>
+            </View>
+        </View>
+    )
 }
-export type News = { _id: string, heading: string, detail: string, classID: string | undefined }
-export type TimedNews = { _id: string, heading: string, detail: string, classID: string | undefined, time: string }
+
+
+
 
 export default NewsFeed;

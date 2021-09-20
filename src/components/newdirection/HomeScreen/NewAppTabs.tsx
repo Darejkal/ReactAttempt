@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { Text, Button } from 'react-native';
+import { Text, Button, View } from 'react-native';
 import { Center } from '../../Center';
 import { NewAuthContext } from '../NewAuthProvider';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
@@ -9,6 +9,8 @@ import { NewAppParamList, NewAppNavProps } from './NewHomeParamList';
 import { HomeStack } from './HomeStack';
 import SettingStack from './SettingStack';
 import I18n from 'i18n-js';
+import QRStack from './QRStack';
+// import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 interface AppTabsProps {
 
@@ -31,22 +33,36 @@ export const NewAppTabs: React.FC<AppTabsProps> = ({ }) => {
             iconName = 'home'
           } else if (route.name === 'Menu') {
             iconName = 'user'
-          }
-          return <AntDesign name={iconName} size={20} color={color}/>;
+          } else if(route.name === 'QR') iconName="qrcode"
+          return <AntDesign name={iconName} style={{ textAlign: 'center' }} size={20} color={color}/>;
         },
         title:I18n.t(route.name),
       })}
+      swipeEnabled={false}
       tabBarOptions={{
         tabStyle:{flexDirection:"row"},
         showIcon:true,
+        showLabel:true,
         iconStyle:{},
         activeTintColor: 'tomato',
         inactiveTintColor: 'gray',
         labelStyle:{textTransform:"capitalize"},
+        indicatorStyle:{
+          backgroundColor:"transparent"
+        },
+        style:{
+          position:"absolute",
+          left:10,
+          right:10,
+          bottom:10,
+          borderRadius:5,
+          padding:4,
+        }
       }}
     >
       <Tabs.Screen name="Home" component={Home}/>
       <Tabs.Screen name="Menu" component={Menu}/>
+      <Tabs.Screen name="QR" component={QR}/>
     </Tabs.Navigator>);
 }
 function Home ({navigation,route}:NewAppNavProps<"Home">){
@@ -54,4 +70,7 @@ function Home ({navigation,route}:NewAppNavProps<"Home">){
 }
 function Menu ({navigation,route}:NewAppNavProps<"Menu">){
   return <SettingStack/>
+}
+function QR ({navigation,route}:NewAppNavProps<"QR">){
+  return <QRStack navigation={navigation}/>
 }

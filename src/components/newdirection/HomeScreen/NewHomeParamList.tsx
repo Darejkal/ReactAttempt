@@ -17,6 +17,7 @@ export type HomeStackNavProps<T extends keyof NewHomeStackParamList>={
 export type NewAppParamList={
     Home:undefined;
     Menu:undefined;
+    QR:undefined;
 }
 export type NewAppNavProps<T extends keyof NewAppParamList>={
     navigation: StackNavigationProp<NewAppParamList, T>;

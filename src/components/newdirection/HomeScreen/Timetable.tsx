@@ -13,7 +13,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { NewHomeStackParamList } from './NewHomeParamList';
 interface TimetableProps {
     refreshing: boolean,
-    navigation?: StackNavigationProp<NewHomeStackParamList, "Home">
+    setRefreshing:React.Dispatch<React.SetStateAction<boolean>>,
+    navigation?: StackNavigationProp<NewHomeStackParamList, "Home">,
+    opacity?:number
 }
 async function getTimetableData(classID: string): Promise<TimetableData | null> {
     try {
@@ -40,7 +42,7 @@ async function getTimetableData(classID: string): Promise<TimetableData | null> 
     }
 }
 
-export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) => {
+export const Timetable: React.FC<TimetableProps> = ({ refreshing,setRefreshing, navigation,opacity }) => {
     //loading and stuffs
     const _isMounted = useRef(true)
     console.log("timetable executed")
@@ -48,6 +50,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) 
     const [TableColumnHead, setTableColumnHead] = useState([I18n.t("error")]);
     const [TableData, setTableData] = useState(["104"]);
     const [done, setDone] = useState(-1);
+    const [onBlurEvent,setOnBlurEvent] = useState(false);
     const { data } = useContext(NewAuthContext);
     console.log("DATA" + data)
     console.log("DATA" + JSON.stringify(data))
@@ -71,6 +74,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) 
         }
     }
     const getTimetableOnline = (classID: string) => {
+        setRefreshing(false);
         getTimetableData(classID)
             .then((timetableData) => {
                 if (!timetableData) throw ("TIMETABLE IS NULL");
@@ -91,13 +95,21 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) 
         return () => { _isMounted.current = false }
     }, [])
     useEffect(() => {
-        if (done === 1) {
-            setTimeout(getTimetableOnline(data!.classID), 10000)
+        if(opacity&&opacity<1) {
+            setOnBlurEvent(true);
         }
-        if (refreshing) {
+        else if(onBlurEvent){
+            setOnBlurEvent(false);
+        }
+        //else if (done === 1) {
+        //     setTimeout(getTimetableOnline(data!.classID), 10000)
+        // }
+        else if (refreshing) {
             getTimetableOnline(data!.classID)
         }
-    })
+    }
+    )
+    
 
     //Choose Timetable
     //TODO
@@ -130,6 +142,7 @@ export const Timetable: React.FC<TimetableProps> = ({ refreshing, navigation }) 
                 />
             </View>
             <TouchableOpacity
+                disabled={onBlurEvent}
                 onPress={() => {
                     navigation?.navigate("FocusedPost", {
                         heading: "",

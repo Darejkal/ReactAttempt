@@ -50,7 +50,17 @@ export async function prepareLanguage() {
             forceLanguageMode:"Prefered language",
             vi:"Vietnamese - Tiếng Việt",
             en:"English",
-            FocusedPost:"Your Timetable"
+            FocusedPost:"Your Timetable",
+            WhatToSay:"Wanna say something?",
+            TypeSomething:"Type something ...",
+            GettingDataFromServerError:"Error while getting data from server 101",
+            PostingDataToServerError102:"Error occured with the submission 102",
+            Success:"Success",
+            SuccessfullySubmitted:"Successfully submitted",
+            UnknowError:"Mysterious error occured, contact the lazy programmer!",
+            UserDoesNotExit:"User does not exit.",
+            QR:"QR Code",
+            Attendedfor:"Attended for"
         },
         vi: {
             tableHeading: "Thời khóa biểu",
@@ -99,7 +109,19 @@ export async function prepareLanguage() {
             forceLanguageMode:"Ngôn ngữ ưu tiên",
             vi:"Tiếng Việt",
             en:"Tiếng Anh - English",
-            FocusedPost:"Thời khóa biểu"
+            FocusedPost:"Thời khóa biểu",
+            WhatToSay:"Bạn muốn nhắn gửi gì hôm nay nào?",
+            TypeSomething:"Gõ gì đó...",
+            GettingDataFromServerError:"Lỗi khi tải dữ liệu 101",
+            Success:"Thành công",
+            SuccessfullySubmitted:"Đăng thành công",
+            PostingDataToServerError102:"Lỗi khi đăng 102",
+            UnknowError:"Phần mềm gặp lỗi lạ hoắc, bạn nên báo cho tên lập trình viên đại lãn sửa đi!",
+            UserDoesNotExit:"Người dùng không tồn tại.",
+            QR:"Mã QR",
+            Attendedfor:"Đã điểm danh:"
+
+            
             
         }
     };

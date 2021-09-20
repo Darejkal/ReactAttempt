@@ -1,5 +1,6 @@
 import React from 'react'
 import { KeyboardAvoidingView, View, Image, Text } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import {NewLoginForm} from './NewLoginForm'
 interface NewLoginProps {
     showLoading:(load:boolean)=>void;
@@ -7,11 +8,11 @@ interface NewLoginProps {
 
 export const NewLogin: React.FC<NewLoginProps> = ({showLoading }) => {
     return (
-        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <ScrollView>
             <View style={{
                 justifyContent: "center",
-                flexGrow: 1,
                 alignItems: "center",
+                marginTop:100
             }}>
                 <Image
                     style={{
@@ -28,9 +29,11 @@ export const NewLogin: React.FC<NewLoginProps> = ({showLoading }) => {
                     opacity: 0.9,
                 }}>An app made for Duck</Text>
             </View>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1, flexDirection: 'column',justifyContent: 'center',}} enabled >
             <View style={{ justifyContent: "center", }}>
                 <NewLoginForm showLoading={(load:boolean)=>showLoading(load)} />
             </View>
         </KeyboardAvoidingView>
+        </ScrollView>
     );
 }
