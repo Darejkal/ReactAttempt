@@ -1,2 +1,1 @@
-"# Toanroirac" 
-"# Bai tap Project cho lop Toanroirac" 
+Bai tap Project cho lop Toanroirac
