@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "ReactAttempt2",
+    "slug": "ReactAttempt2",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./src/images/logo.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tpc.reactattempt2",
+      "buildNumber": "1.0.0",
+      "infoPlist":{
+      "UIBackgroundModes": [
+        "fetch"
+      ]
+    }
+    },
+    "android": {
+      "package": "com.tpc.reactattempt2",
+      "versionCode": 1,
+      "useNextNotificationsApi": true
+    }
+  }
+}
